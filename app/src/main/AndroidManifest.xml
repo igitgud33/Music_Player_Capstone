@@ -3,31 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".music_player_app.backend.app.CustomApp"
+        android:name="com.example.musicplayer.music_player_app.backend.app.CustomApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="MusicPlayer"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="31">
+
         <activity
-            android:name=".music_player_app.frontend.screens.register.RegisterActivity"
+            android:name="com.example.musicplayer.music_player_app.frontend.screens.dashboard.DashboardActivity"
             android:exported="true" />
+
         <activity
-            android:name=".music_player_app.frontend.screens.dashboard.DashboardActivity"
-            android:exported="true" />
+            android:name="com.example.musicplayer.music_player_app.frontend.screens.playlist.PlaylistActivity"
+            android:exported="false" />
+
         <activity
-            android:name=".music_player_app.frontend.screens.login.LoginActivity"
+            android:name="com.example.musicplayer.music_player_app.frontend.screens.login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.musicplayer.music_player_app.frontend.screens.register.RegisterActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
