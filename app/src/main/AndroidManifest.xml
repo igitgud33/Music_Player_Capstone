@@ -35,6 +35,12 @@
             android:name="com.example.musicplayer.music_player_app.frontend.screens.register.RegisterActivity"
             android:exported="false" />
 
+        <service
+            android:name=".music_player_app.backend.service.MusicService"
+            android:enabled="true"
+            android:exported="false"
+            />
+
     </application>
 
 </manifest>
