@@ -5,10 +5,31 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
+    <ImageView
+        android:id="@+id/albumImage"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:scaleType="centerCrop"/>
+
     <TextView
+        android:id="@+id/songTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Music Player :)"
-        android:textSize="50dp"/>
+        android:text="Song Title"
+        android:textSize="40dp"/>
+
+    <TextView
+        android:id="@+id/songArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Song Artist"
+        android:textSize="20dp"/>
+
+    <Button
+        android:id="@+id/btnPlayPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play/Pause"
+        />
 
 </LinearLayout>
