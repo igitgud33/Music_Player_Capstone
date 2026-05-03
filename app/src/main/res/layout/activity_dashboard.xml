@@ -23,4 +23,12 @@
         android:padding="10dp"
         android:text="Back to Login" />
 
+    <Button
+        android:id="@+id/btnPlayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:text="Play a Song" />
+
 </LinearLayout>

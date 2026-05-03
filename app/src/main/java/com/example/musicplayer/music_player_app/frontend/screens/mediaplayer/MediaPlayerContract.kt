@@ -9,7 +9,7 @@ class MediaPlayerContract {
         fun updateProgress(currentMinSec: Int, durationMinSec: Int) // song progress bar
     }
 
-    // User-based
+    // Logic-based
     interface Presenter {
         fun onPlayPauseClick()
         fun onPreviousClick()
