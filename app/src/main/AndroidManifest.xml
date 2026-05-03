@@ -22,6 +22,9 @@
             android:name="com.example.musicplayer.music_player_app.frontend.screens.playlist.PlaylistActivity"
             android:exported="false" />
 
+        <activity android:name="com.example.musicplayer.music_player_app.frontend.screens.library.LibraryActivity"
+            android:exported="false" />
+
         <activity
             android:name="com.example.musicplayer.music_player_app.frontend.screens.login.LoginActivity"
             android:exported="true">
