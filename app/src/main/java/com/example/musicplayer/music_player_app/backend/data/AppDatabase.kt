@@ -9,6 +9,7 @@ import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 @Database(entities = [Song::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
+    abstract fun albumDao(): AlbumDao
 
     companion object {
         @Volatile

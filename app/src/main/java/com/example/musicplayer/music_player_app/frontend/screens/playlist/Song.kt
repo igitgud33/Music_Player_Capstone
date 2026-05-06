@@ -10,4 +10,5 @@ data class Song(
     val artist: String,
     val fileUri: String,
     val playlistId: Int? = null
+    val albumId: Int? = null
 )

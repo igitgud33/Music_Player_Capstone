@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_gravity="center">
+
+    <!-- user inputs album details -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Album Name"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etAlbumName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Album Name"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Album Artist"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etAlbumArtist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Album Artist"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="16dp"/>
+
+</LinearLayout>
