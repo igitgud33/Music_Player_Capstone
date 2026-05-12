@@ -24,7 +24,7 @@ class LibraryActivity : AppCompatActivity(), LibraryContract.View {
 
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        presenter = LibraryPresenter(this, LibraryModel())
+        presenter = LibraryPresenter(this, LibraryModel(this))
         presenter.loadLibrary()
     }
 

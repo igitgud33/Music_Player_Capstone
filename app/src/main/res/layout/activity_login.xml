@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:orientation="vertical"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="30sp"
     android:layout_height="match_parent"
-    tools:context=".music_player_app.frontend.screens.login.LoginActivity">
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@color/black">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:layout_gravity="center_horizontal"
-        android:padding="10dp"
-        android:layout_marginTop="20dp"
-        android:textSize="40sp"/>
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Music Media Player"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:layout_marginBottom="40dp"/>
 
     <EditText
         android:id="@+id/edittextUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username"
-        android:layout_margin="15dp"
-        android:padding="10dp"
-        />
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="#888888"
+        android:backgroundTint="@color/white"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/edittextPassword"
@@ -33,28 +42,24 @@
         android:layout_height="wrap_content"
         android:hint="Password"
         android:inputType="textPassword"
-        android:layout_margin="15dp"
-        android:padding="10dp"
-        />
+        android:textColor="@color/white"
+        android:textColorHint="#888888"
+        android:backgroundTint="@color/white"
+        android:layout_marginBottom="32dp"/>
 
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:padding="10dp"/>
+        android:text="Sign In"
+        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:id="@+id/textviewRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Not yet Registered?"
-        android:layout_gravity="center_horizontal"
-        android:padding="10dp"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/blue"
-        />
+        android:text="Create an account"
+        android:textColor="@color/white"
+        android:textSize="14sp"/>
 
 </LinearLayout>
