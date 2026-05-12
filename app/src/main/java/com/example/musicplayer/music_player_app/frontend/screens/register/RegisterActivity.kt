@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import com.example.musicplayer.R
 import com.example.musicplayer.music_player_app.backend.app.CustomApp
 import com.example.musicplayer.music_player_app.frontend.screens.login.LoginActivity
@@ -20,6 +21,7 @@ class RegisterActivity : Activity(), RegisterContract.View {
         registerPresenter = RegisterPresenter(this, RegisterModel(application as CustomApp))
 
         val buttonRegister = findViewById<Button>(R.id.buttonRegister)
+        val textviewLogin = findViewById<TextView>(R.id.textviewLogin)
 
         buttonRegister.setOnClickListener {
             val username = getEditTextValue(R.id.edittextUsername)
@@ -27,6 +29,10 @@ class RegisterActivity : Activity(), RegisterContract.View {
             val confirmPassword = getEditTextValue(R.id.edittextConfirmPassword)
 
             registerPresenter.register(username, password, confirmPassword)
+        }
+
+        textviewLogin.setOnClickListener {
+            goToLogin()
         }
     }
 
