@@ -1,34 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".music_player_app.frontend.screens.dashboard.DashboardActivity"
-    android:orientation="vertical">
+    android:background="#121212"
+    android:orientation="vertical"
+    android:padding="24dp"
+    tools:context="com.example.musicplayer.music_player_app.frontend.screens.dashboard.DashboardActivity">
 
     <TextView
         android:id="@+id/textviewUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:text="Good day, Jerry"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:layout_margin="20dp"
-        />
+        android:alignmentMode="alignMargins"
+        android:columnCount="2"
+        android:columnOrderPreserved="false">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardLibrary"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="#1E1E1E"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📚"
+                    android:textSize="40sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Library"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPlayer"
+            android:layout_width="0dp"
+            android:layout_height="140dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="#1E1E1E"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎵"
+                    android:textSize="40sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Now Playing"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </GridLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/buttonBackToLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:padding="10dp"
-        android:text="Back to Login" />
-
-    <Button
-        android:id="@+id/btnPlayer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:padding="10dp"
-        android:text="Play a Song" />
+        android:layout_height="60dp"
+        android:backgroundTint="#2C2C2C"
+        android:text="Logout"
+        android:textColor="#FF5252"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="16dp" />
 
 </LinearLayout>
