@@ -16,7 +16,7 @@ import com.example.musicplayer.music_player_app.frontend.utils.toast
 class LoginActivity : Activity(), LoginContract.View {
     lateinit var Presenter: LoginPresenter
 
-    var username = "";
+    var username = ""
     var password = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,15 +27,14 @@ class LoginActivity : Activity(), LoginContract.View {
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         val textviewRegister = findViewById<TextView>(R.id.textviewRegister)
 
-        buttonLogin.setOnClickListener{
+        buttonLogin.setOnClickListener {
             username = getEditTextValue(R.id.edittextUsername)
             password = getEditTextValue(R.id.edittextPassword)
 
             Presenter.login(username, password)
         }
 
-        textviewRegister.setOnClickListener{
-
+        textviewRegister.setOnClickListener {
             val registerIntent = Intent(this, RegisterActivity::class.java)
             startActivity(registerIntent)
             finish()
@@ -56,7 +55,7 @@ class LoginActivity : Activity(), LoginContract.View {
 
     override fun showHome() {
         val dashboardIntent = Intent(this, DashboardActivity::class.java)
-
+        dashboardIntent.putExtra("LOGGED_IN_USERNAME", username)
         startActivity(dashboardIntent)
         finish()
     }

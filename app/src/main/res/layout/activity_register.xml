@@ -4,75 +4,53 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
-    android:background="@color/black"
-    tools:context=".music_player_app.frontend.screens.register.RegisterActivity">
+    tools:context=".music_player_app.frontend.screens.register.RegisterActivity"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Register"
-        android:textColor="@color/white"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="4dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create Your Account"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:layout_marginBottom="40dp"/>
+        android:layout_gravity="center_horizontal"
+        android:padding="10dp"
+        android:layout_marginTop="20dp"
+        android:textSize="40sp"
+        />
 
     <EditText
         android:id="@+id/edittextUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="#888888"
-        android:backgroundTint="@color/white"
-        android:layout_marginBottom="16dp"/>
+        android:padding="10dp"
+        android:layout_marginTop="5dp"
+        />
 
     <EditText
         android:id="@+id/edittextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
         android:inputType="textPassword"
-        android:textColor="@color/white"
-        android:textColorHint="#888888"
-        android:backgroundTint="@color/white"
-        android:layout_marginBottom="16dp"/>
+        android:hint="Password"
+        android:padding="10dp"
+        android:layout_marginTop="5dp"
+        />
 
     <EditText
         android:id="@+id/edittextConfirmPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Confirm Password"
         android:inputType="textPassword"
-        android:textColor="@color/white"
-        android:textColorHint="#888888"
-        android:backgroundTint="@color/white"
-        android:layout_marginBottom="32dp"/>
+        android:hint="Confirm Password"
+        android:padding="10dp"
+        android:layout_marginTop="5dp"
+        />
 
     <Button
         android:id="@+id/buttonRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:id="@+id/textviewLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Already have an account? Login"
-        android:textColor="@color/white"
-        android:textSize="14sp"/>
-
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        android:text="Register" />
 </LinearLayout>
