@@ -6,14 +6,18 @@ interface PlaylistContract {
         fun hideLoading()
         fun displayPlaylist(songs: List<Song>)
         fun showError(message: String)
+        fun showUploadSuccess()
+        fun showUploadError(message: String)
     }
 
     interface Presenter {
-        fun loadPlaylist()
+        fun loadPlaylist(playlistId: Int)
+        fun uploadSong(uriString: String, playlistId: Int)
         fun onDestroy()
     }
 
     interface Model {
-        fun fetchSongs(callback: (List<Song>?, Throwable?) -> Unit)
+        fun saveSongToDatabase(uriString: String, playlistId: Int, callback: (Boolean, String?) -> Unit)
+        fun getSongsFromDatabase(playlistId: Int, callback: (List<Song>) -> Unit)
     }
 }

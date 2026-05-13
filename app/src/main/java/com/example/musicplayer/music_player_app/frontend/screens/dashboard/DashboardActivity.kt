@@ -23,6 +23,7 @@ class DashboardActivity : Activity(), DashboardContract.View {
 
         textViewWelcome = findViewById(R.id.textviewUser)
         dashboardPresenter = DashboardPresenter(this, DashboardModel(application as CustomApp))
+
         dashboardPresenter.initializeUsername()
 
         val cardLibrary = findViewById<CardView>(R.id.cardLibrary)

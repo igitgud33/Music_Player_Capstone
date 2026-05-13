@@ -4,16 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp"
-    android:layout_marginBottom="8dp"
+    android:layout_marginBottom="12dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:padding="8dp">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardIcon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/cardPlaylistIcon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         app:cardBackgroundColor="#2C2C2C"
         app:cardCornerRadius="8dp"
         app:cardElevation="0dp"
@@ -25,38 +25,38 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="🎵"
-            android:textSize="24sp" />
+            android:text="🎧"
+            android:textSize="30sp" />
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/textSongTitle"
+        android:id="@+id/textPlaylistName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Song Title"
+        android:text="Playlist Name"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textSongArtist"
+        app:layout_constraintBottom_toTopOf="@+id/textPlaylistSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/cardIcon"
-        app:layout_constraintTop_toTopOf="@id/cardIcon"
+        app:layout_constraintStart_toEndOf="@id/cardPlaylistIcon"
+        app:layout_constraintTop_toTopOf="@id/cardPlaylistIcon"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
-        android:id="@+id/textSongArtist"
+        android:id="@+id/textPlaylistSubtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Unknown Artist"
+        android:text="Tap to view songs"
         android:textColor="#A0A0A0"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/cardIcon"
+        app:layout_constraintBottom_toBottomOf="@id/cardPlaylistIcon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/cardIcon"
-        app:layout_constraintTop_toBottomOf="@id/textSongTitle" />
+        app:layout_constraintStart_toEndOf="@id/cardPlaylistIcon"
+        app:layout_constraintTop_toBottomOf="@id/textPlaylistName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

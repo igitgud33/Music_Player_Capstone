@@ -6,29 +6,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context="com.example.musicplayer.music_player_app.frontend.screens.library.LibraryActivity">
+    tools:context=".music_player_app.frontend.screens.library.LibraryActivity">
 
-    <ProgressBar
-        android:id="@+id/progressBarLibrary"
+    <!-- Premium Header -->
+    <TextView
+        android:id="@+id/textLibraryTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="Your Library"
+        android:textColor="#FFFFFF"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- The Missing Create Button! -->
+    <Button
+        android:id="@+id/btnCreatePlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="24dp"
+        android:backgroundTint="#FFFFFF"
+        android:text="+ New Playlist"
+        android:textColor="#121212"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- The Scrollable Playlist List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLibrary"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:clipToPadding="false"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/btnCreatePlaylist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_playlist_placeholder" />
+        app:layout_constraintTop_toBottomOf="@id/textLibraryTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

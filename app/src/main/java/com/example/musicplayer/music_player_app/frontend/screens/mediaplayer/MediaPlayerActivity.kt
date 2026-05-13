@@ -1,111 +1,145 @@
 package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
-import android.os.PersistableBundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicplayer.R
-import com.example.musicplayer.music_player_app.backend.service.MusicService
+import java.util.concurrent.TimeUnit
 
-class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
-    private lateinit var presenter: MediaPlayerContract.Presenter
+class MediaPlayerActivity : AppCompatActivity() {
 
-    // Service implementation
-    private var musicService: MusicService? = null
-
-    // allows Activity to use Music Service
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MusicService.MusicBinder
-            musicService = binder.getService()
-
-            // (!! - assured to be not null)
-            presenter = MediaPlayerPresenter(this@MediaPlayerActivity, musicService!!)
-
-            // seekbar init
-            seekBar = findViewById<SeekBar>(R.id.playerSeekBar)
-
-            // execute when user manually moves slider
-            seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
-                    if (fromUser) {
-                        presenter.seekTo(progress)
-                    }
-                }
-
-
-                override fun onStartTrackingTouch(p0: SeekBar?) {}
-                override fun onStopTrackingTouch(p0: SeekBar?) {}
-            })
-
-            // play/pause btn
-            val playPauseBtn = findViewById<Button>(R.id.btnPlayPause)
-
-            playPauseBtn.setOnClickListener {
-                presenter.onPlayPauseClick()
-            }
-
-
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            musicService = null
-        }
-    }
-
-    // seekbar
+    private var mediaPlayer: MediaPlayer? = null
     private lateinit var seekBar: SeekBar
+    private lateinit var textCurrentTime: TextView
+    private lateinit var textTotalTime: TextView
+    private lateinit var btnPlayPause: Button
+    private lateinit var textTitle: TextView
+    private lateinit var textArtist: TextView
+
+    // The handler runs a background timer to update the progress bar every second
+    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var runnable: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
-        // bind to MusicService
-        val intent = Intent(this, MusicService::class.java)
-        bindService(intent, serviceConnection, BIND_AUTO_CREATE)
+        // 1. Bind Views
+        seekBar = findViewById(R.id.seekBarPlayer)
+        textCurrentTime = findViewById(R.id.textCurrentTime)
+        textTotalTime = findViewById(R.id.textTotalTime)
+        btnPlayPause = findViewById(R.id.btnPlayPause)
+        textTitle = findViewById(R.id.textPlayerTitle)
+        textArtist = findViewById(R.id.textPlayerArtist)
 
-    }
+        // 2. Catch the data thrown by the PlaylistAdapter
+        val title = intent.getStringExtra("SONG_TITLE") ?: "Unknown Title"
+        val artist = intent.getStringExtra("SONG_ARTIST") ?: "Unknown Artist"
+        val uriString = intent.getStringExtra("SONG_URI")
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unbindService(serviceConnection)
-        presenter.onDestroy()
-    }
+        textTitle.text = title
+        textArtist.text = artist
 
-    override fun updateSongInfo(title: String, artist: String) {
-        findViewById<TextView>(R.id.songTitle).text = title
-        findViewById<TextView>(R.id.songArtist).text = artist
-    }
-
-    override fun setPlayPauseIcon(isPlaying: Boolean) {
-        val playPauseBtn = findViewById<Button>(R.id.btnPlayPause)
-        playPauseBtn.text = if(isPlaying) {
-            "Pause"
+        // 3. Boot up the Audio Engine
+        if (uriString != null) {
+            initializePlayer(Uri.parse(uriString))
         } else {
-            "Play"
+            Toast.makeText(this, "Error: Audio file missing.", Toast.LENGTH_SHORT).show()
+        }
+
+        // 4. Play/Pause Click Listener
+        btnPlayPause.setOnClickListener {
+            togglePlayPause()
+        }
+
+        // 5. Let the user drag the slider to scrub through the song
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) mediaPlayer?.seekTo(progress)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+    }
+
+    private fun initializePlayer(uri: Uri) {
+        try {
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(applicationContext, uri)
+                prepareAsync() // Prepares in the background so it doesn't freeze the screen
+
+                setOnPreparedListener {
+                    // When the song is ready, set the timers and hit play
+                    seekBar.max = duration
+                    textTotalTime.text = formatTime(duration)
+                    start()
+                    btnPlayPause.text = "Pause"
+                    updateSeekBar()
+                }
+
+                setOnCompletionListener {
+                    // When the song ends, reset the UI
+                    btnPlayPause.text = "Play"
+                    seekBar.progress = 0
+                    textCurrentTime.text = formatTime(0)
+                    if (::runnable.isInitialized) handler.removeCallbacks(runnable)
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Failed to load audio file", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // helper fun to convert millis to 0:00 format
-    private fun formatTime(ms: Int): String {
-        val mins = (ms / 1000) / 60
-        val secs = (ms / 1000) % 60
-        return String.format("%d:%02d", mins, secs)
+    private fun togglePlayPause() {
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                it.pause()
+                btnPlayPause.text = "Play"
+            } else {
+                it.start()
+                btnPlayPause.text = "Pause"
+                updateSeekBar()
+            }
+        }
     }
 
-    override fun updateProgress(currentMinSec: Int, durationMinSec: Int) {
-        seekBar.max = durationMinSec
-        seekBar.progress = currentMinSec
+    private fun updateSeekBar() {
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                seekBar.progress = it.currentPosition
+                textCurrentTime.text = formatTime(it.currentPosition)
 
-        // update text timer (rudimentary)
-        findViewById<TextView>(R.id.textCurrentTime).text = formatTime(currentMinSec)
-        findViewById<TextView>(R.id.textTotalTime).text = formatTime(durationMinSec)
+                // Loop this function every 1000ms (1 second) to move the slider
+                runnable = Runnable { updateSeekBar() }
+                handler.postDelayed(runnable, 1000)
+            }
+        }
+    }
 
+    // Helper math function to turn raw milliseconds into clean "3:45" text
+    private fun formatTime(millis: Int): String {
+        return String.format(
+            "%d:%02d",
+            TimeUnit.MILLISECONDS.toMinutes(millis.toLong()),
+            TimeUnit.MILLISECONDS.toSeconds(millis.toLong()) -
+                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis.toLong()))
+        )
+    }
+
+    // Critical: When the user presses the back button, kill the audio engine so it doesn't play forever!
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        if (::runnable.isInitialized) {
+            handler.removeCallbacks(runnable)
+        }
     }
 }
