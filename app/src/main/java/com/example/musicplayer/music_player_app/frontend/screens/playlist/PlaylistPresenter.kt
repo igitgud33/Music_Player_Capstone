@@ -1,29 +1,27 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
 class PlaylistPresenter(
-    private val view: PlaylistContract.View,
+    private var view: PlaylistContract.View?,
     private val model: PlaylistContract.Model
 ) : PlaylistContract.Presenter {
 
-    override fun loadPlaylist(playlistId: Int) {
-        view.showLoading()
-        model.getSongsFromDatabase(playlistId) { songs ->
-            view.hideLoading()
-            view.displayPlaylist(songs)
-        }
-    }
+    override fun loadPlaylist() {
+        view?.showLoading()
 
-    override fun uploadSong(uriString: String, playlistId: Int) {
-        model.saveSongToDatabase(uriString, playlistId) { success, error ->
-            if (success) {
-                view.showUploadSuccess()
+        model.fetchSongs { songs, error ->
+            view?.hideLoading()
+
+            if (error != null) {
+                view?.showError(error.message ?: "An unknown error occurred while loading the playlist.")
+            } else if (songs != null && songs.isNotEmpty()) {
+                view?.displayPlaylist(songs)
             } else {
-                view.showUploadError(error ?: "Unknown error occurred")
+                view?.showError("Your playlist is empty.")
             }
         }
     }
 
     override fun onDestroy() {
-        // Handle any cleanup here if necessary
+        view = null
     }
 }

@@ -1,14 +1,12 @@
 package com.example.musicplayer.music_player_app.frontend.screens.dashboard
 
-interface DashboardContract {
+class DashboardContract {
     interface View {
         fun displayUsername(message: String)
     }
 
-    interface Presenter {
+    interface Presenter{
         fun initializeUsername()
     }
 
-    interface Model {
-    }
 }

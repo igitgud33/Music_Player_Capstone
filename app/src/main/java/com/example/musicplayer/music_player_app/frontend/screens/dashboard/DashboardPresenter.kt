@@ -5,7 +5,7 @@ class DashboardPresenter(private val view: DashboardContract.View, private val m
     override fun initializeUsername() {
         val username = model.getUsername()
 
-        if(username.isNotEmpty()){
+        if(!username.isNullOrEmpty()){
             view.displayUsername("Good day, $username")
         }
         else{

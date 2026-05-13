@@ -90,19 +90,58 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnPlayPause"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="#8A65D6"
-        android:text="Pause"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="30dp"
+    <!-- btns -->
+    <ImageButton
+        android:id="@+id/btnShuffle"
+        android:src="@drawable/baseline_shuffle_24"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".04"
+        android:text="Shuffle"
+        android:background="transparent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnPrevSong"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTimers"/>
+
+    <ImageButton
+        android:id="@+id/btnPrevSong"
+        android:src="@drawable/baseline_skip_previous_24"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".1"
+        android:text="Back"
+        android:background="transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
+        app:layout_constraintEnd_toStartOf="@+id/btnPlayPause"
+        app:layout_constraintStart_toEndOf="@+id/btnShuffle"
+        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
+
+    <ImageButton
+        android:id="@+id/btnPlayPause"
+        android:src="@drawable/baseline_play_circle_24"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".1"
+        android:text="Play/Pause"
+        android:background="transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
+        app:layout_constraintEnd_toStartOf="@+id/btnNextSong"
+        app:layout_constraintStart_toEndOf="@+id/btnPrevSong"
+        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
+
+    <ImageButton
+        android:id="@+id/btnNextSong"
+        android:src="@drawable/baseline_skip_next_24"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".1"
+        android:text="Next"
+        android:background="transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/btnPlayPause"
+        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
