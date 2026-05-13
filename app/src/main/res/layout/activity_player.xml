@@ -65,12 +65,54 @@
 
     </LinearLayout>
 
-    <!-- pause/play btn -->
-    <Button
-        android:id="@+id/btnPlayPause"
-        android:layout_width="wrap_content"
+    <!-- btns -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Play/Pause"
-        />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnShuffle"
+            android:src="@drawable/baseline_shuffle_24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".04"
+            android:text="Shuffle"
+            android:background="transparent"
+            android:layout_marginRight="-25dp"/>
+
+        <ImageButton
+            android:id="@+id/btnPrevSong"
+            android:src="@drawable/baseline_skip_previous_24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".1"
+            android:text="Back"
+            android:background="transparent"
+            android:layout_marginRight="-135dp"/>
+
+
+        <ImageButton
+            android:id="@+id/btnPlayPause"
+            android:src="@drawable/baseline_play_circle_24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".1"
+            android:text="Play/Pause"
+            android:background="transparent"
+            android:layout_marginRight="-135dp"/>
+
+        <ImageButton
+            android:id="@+id/btnNextSong"
+            android:src="@drawable/baseline_skip_next_24"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".1"
+            android:text="Next"
+            android:background="transparent"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>
