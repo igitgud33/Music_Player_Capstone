@@ -7,6 +7,18 @@
     android:background="#0A0A0A"
     android:padding="24dp">
 
+    <TextView
+        android:id="@+id/textSelectPlaylist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Select Playlist"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <!-- Album Art Placeholder -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardAlbumArt"
@@ -21,7 +33,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textSelectPlaylist">
 
         <TextView
             android:layout_width="match_parent"
@@ -97,35 +109,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".04"
-        android:text="Shuffle"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnPrevSong"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutTimers"/>
-    <ImageButton
 
+    <ImageButton
         android:id="@+id/btnPrevSong"
         android:src="@drawable/baseline_skip_previous_24"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".1"
-        android:text="Back"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
         app:layout_constraintEnd_toStartOf="@+id/btnPlayPause"
         app:layout_constraintStart_toEndOf="@+id/btnShuffle"
         app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/btnPlayPause"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".1"
-        android:text="Play/Pause"
+        android:src="@drawable/ic_play"
         android:background="@android:color/transparent"
-        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
         app:layout_constraintEnd_toStartOf="@+id/btnNextSong"
         app:layout_constraintStart_toEndOf="@+id/btnPrevSong"
@@ -137,7 +146,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".1"
-        android:text="Next"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
         app:layout_constraintEnd_toEndOf="parent"

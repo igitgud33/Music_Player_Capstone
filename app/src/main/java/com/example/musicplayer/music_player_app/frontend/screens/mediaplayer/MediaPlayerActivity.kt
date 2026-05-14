@@ -1,7 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
@@ -55,7 +54,7 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
         } else {
             startService(intent)
         }
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection, BIND_AUTO_CREATE)
     }
 
     private fun setupUI() {
@@ -158,7 +157,7 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
     private fun formatTime(ms: Int): String {
         val mins = (ms / 1000) / 60
         val secs = (ms / 1000) % 60
-        return String.format("%d:%02d", mins, secs)
+        return String.format(java.util.Locale.getDefault(), "%d:%02d", mins, secs)
     }
 
     override fun onDestroy() {
