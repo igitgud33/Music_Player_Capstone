@@ -4,9 +4,8 @@ import android.app.Application
 import com.example.musicplayer.music_player_app.backend.data.User
 
 class CustomApp : Application() {
-    var defaultUsername: String = "test"
-    var defaultPassword: String = "test"
-    var loginUser: User = User()
+    // loginUser is deprecated in favor of SessionManager
+    var loginUser: User? = null
 
     override fun onCreate() {
         super.onCreate()

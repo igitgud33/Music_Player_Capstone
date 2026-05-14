@@ -144,9 +144,9 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
                 btn.alpha = 1.0f
                 "Mode: Shuffle"
             }
-            MusicService.PlaybackMode.RANDOM -> {
+            MusicService.PlaybackMode.LOOP -> {
                 btn.alpha = 1.0f
-                "Mode: Random"
+                "Mode: Loop"
             }
         }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

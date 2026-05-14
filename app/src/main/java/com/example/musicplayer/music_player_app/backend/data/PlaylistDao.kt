@@ -7,6 +7,9 @@ import androidx.room.Query
 
 @Dao
 interface PlaylistDao {
+    @Query("SELECT * FROM playlists WHERE userId = :userId")
+    suspend fun getPlaylistsByUserId(userId: Int): List<Playlist>
+
     @Query("SELECT * FROM playlists")
     suspend fun getAllPlaylists(): List<Playlist>
 

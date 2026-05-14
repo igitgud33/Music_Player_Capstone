@@ -1,6 +1,7 @@
 package com.example.musicplayer.music_player_app.frontend.screens.library
 
 import com.example.musicplayer.music_player_app.backend.data.Playlist
+import com.example.musicplayer.music_player_app.backend.data.SessionManager
 
 class LibraryPresenter(
     private var view: LibraryContract.View?,
@@ -26,7 +27,12 @@ class LibraryPresenter(
     }
 
     override fun addPlaylist(name: String, coverUri: String) {
-        val newPlaylist = Playlist(name = name, coverUri = coverUri)
+        val userId = SessionManager.currentUserId
+        if (userId == -1) {
+            view?.showError("User not logged in.")
+            return
+        }
+        val newPlaylist = Playlist(userId = userId, name = name, coverUri = coverUri)
         model.insertPlaylist(newPlaylist) { error ->
             if (error != null) {
                 view?.showError("Failed to add playlist: ${error.message}")
@@ -37,8 +43,9 @@ class LibraryPresenter(
     }
 
     fun deletePlaylists(playlistIds: List<Int>) {
+        val userId = SessionManager.currentUserId
         // Need full playlist objects for @Delete
-        val playlistsToDelete = playlistIds.map { Playlist(id = it, name = "", coverUri = "") }
+        val playlistsToDelete = playlistIds.map { Playlist(id = it, userId = userId, name = "", coverUri = "") }
         model.deletePlaylists(playlistsToDelete) { error ->
             if (error != null) {
                 view?.showError("Failed to delete playlists: ${error.message}")

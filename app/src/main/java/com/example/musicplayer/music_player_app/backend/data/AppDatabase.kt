@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 
-@Database(entities = [Song::class, Album::class, Playlist::class], version = 1, exportSchema = false)
+@Database(entities = [User::class, Song::class, Album::class, Playlist::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
     abstract fun songDao(): SongDao
     abstract fun albumDao(): AlbumDao
     abstract fun playlistDao(): PlaylistDao
@@ -22,7 +23,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "music_player_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration() // Simpler for development when schema changes
+                .build()
                 INSTANCE = instance
                 instance
             }

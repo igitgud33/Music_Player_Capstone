@@ -2,6 +2,7 @@ package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
 import com.example.musicplayer.music_player_app.backend.data.Playlist
+import com.example.musicplayer.music_player_app.backend.data.SessionManager
 import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +16,13 @@ class MediaPlayerModel(private val database: AppDatabase) : MediaPlayerContract.
     override fun fetchPlaylists(callback: (List<Playlist>?, Throwable?) -> Unit) {
         scope.launch {
             try {
+                val userId = SessionManager.currentUserId
                 val playlists = withContext(Dispatchers.IO) {
-                    database.playlistDao().getAllPlaylists()
+                    if (userId != -1) {
+                        database.playlistDao().getPlaylistsByUserId(userId)
+                    } else {
+                        emptyList()
+                    }
                 }
                 callback(playlists, null)
             } catch (e: Exception) {

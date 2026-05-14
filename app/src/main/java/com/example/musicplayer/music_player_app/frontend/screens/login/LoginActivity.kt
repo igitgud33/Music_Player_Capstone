@@ -23,7 +23,7 @@ class LoginActivity : Activity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        Presenter = LoginPresenter(this, LoginModel(application as CustomApp))
+        Presenter = LoginPresenter(this, LoginModel(this))
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         val textviewRegister = findViewById<TextView>(R.id.textviewRegister)
 

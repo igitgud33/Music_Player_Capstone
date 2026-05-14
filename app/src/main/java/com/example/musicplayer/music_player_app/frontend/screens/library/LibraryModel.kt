@@ -3,6 +3,7 @@ package com.example.musicplayer.music_player_app.frontend.screens.library
 import android.content.Context
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
 import com.example.musicplayer.music_player_app.backend.data.Playlist
+import com.example.musicplayer.music_player_app.backend.data.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,12 @@ class LibraryModel(private val context: Context) : LibraryContract.Model {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val databasePlaylists = playlistDao.getAllPlaylists()
+                val userId = SessionManager.currentUserId
+                val databasePlaylists = if (userId != -1) {
+                    playlistDao.getPlaylistsByUserId(userId)
+                } else {
+                    emptyList()
+                }
 
                 val displayPlaylists = databasePlaylists.map { dbPlaylist ->
                     val songCount = songDao.getSongCountForPlaylist(dbPlaylist.id)
