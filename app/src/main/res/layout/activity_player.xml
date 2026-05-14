@@ -73,15 +73,17 @@
         android:layout_marginBottom="8dp"
         android:progressTint="#8A65D6"
         android:thumbTint="#8A65D6"
-        app:layout_constraintBottom_toTopOf="@+id/layoutTimers" />
+        app:layout_constraintBottom_toTopOf="@+id/layoutTimers"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"/>
 
     <LinearLayout
         android:id="@+id/layoutTimers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/btnPlayPause">
+        app:layout_constraintBottom_toTopOf="@+id/layoutControls">
 
         <TextView
             android:id="@+id/textCurrentTime"
@@ -103,53 +105,65 @@
     </LinearLayout>
 
     <!-- btns -->
-    <ImageButton
-        android:id="@+id/btnShuffle"
-        android:src="@drawable/baseline_shuffle_24"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/layoutControls"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight=".04"
-        android:background="@android:color/transparent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnPrevSong"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutTimers"/>
-
-    <ImageButton
-        android:id="@+id/btnPrevSong"
-        android:src="@drawable/baseline_skip_previous_24"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".1"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
-        app:layout_constraintEnd_toStartOf="@+id/btnPlayPause"
-        app:layout_constraintStart_toEndOf="@+id/btnShuffle"
-        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
-
-    <ImageButton
-        android:id="@+id/btnPlayPause"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".1"
-        android:src="@drawable/ic_play"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
-        app:layout_constraintEnd_toStartOf="@+id/btnNextSong"
-        app:layout_constraintStart_toEndOf="@+id/btnPrevSong"
-        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
-
-    <ImageButton
-        android:id="@+id/btnNextSong"
-        android:src="@drawable/baseline_skip_next_24"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".1"
-        android:background="@android:color/transparent"
-        app:layout_constraintBottom_toBottomOf="@+id/btnShuffle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnPlayPause"
-        app:layout_constraintTop_toTopOf="@+id/btnShuffle"/>
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnShuffle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Shuffle"
+            android:src="@drawable/baseline_shuffle_24" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnPrevSong"
+            android:layout_width="80dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Previous Song"
+            android:src="@drawable/baseline_skip_previous_24" />
+
+        <ImageButton
+            android:id="@+id/btnPlayPause"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Play or Pause"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_play_circle_24" />
+
+        <ImageButton
+            android:id="@+id/btnNextSong"
+            android:layout_width="80dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Next Song"
+            android:src="@drawable/baseline_skip_next_24" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
