@@ -170,7 +170,7 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
 
     override fun setPlayPauseIcon(isPlaying: Boolean) {
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
-        playPauseBtn.setImageResource(if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
+        playPauseBtn.setImageResource(if (isPlaying) R.drawable.baseline_pause_circle_outline_24 else R.drawable.baseline_play_circle_24)
     }
 
     override fun updateProgress(currentMinSec: Int, durationMinSec: Int) {
