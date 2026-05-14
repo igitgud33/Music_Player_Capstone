@@ -2,61 +2,57 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context="com.example.musicplayer.music_player_app.frontend.screens.playlist.PlaylistActivity">
+    android:fitsSystemWindows="true">
 
-    <ProgressBar
-        android:id="@+id/progressBarPlaylist"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/layoutPlaylistHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textPlaylistTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My Playlist"
+            android:textColor="@android:color/white"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/buttonEditPlaylistTitle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="#B3B3B3" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPlaylist"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_song_placeholder" />
+        app:layout_constraintTop_toBottomOf="@id/layoutPlaylistHeader" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddSong"
+        android:id="@+id/fabUploadSong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        android:src="@drawable/ic_add"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="#1DB954"
         app:tint="@android:color/white"
-        app:backgroundTint="#8A65D6"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Add Song" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabDeleteSongs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:visibility="gone"
-        app:tint="@android:color/white"
-        app:backgroundTint="#D32F2F"
-        app:layout_constraintBottom_toTopOf="@+id/fabAddSong"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Delete Selected Songs" />
-
-
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

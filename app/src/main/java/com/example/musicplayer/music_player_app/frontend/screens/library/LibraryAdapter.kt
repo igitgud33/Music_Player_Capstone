@@ -1,6 +1,5 @@
 package com.example.musicplayer.music_player_app.frontend.screens.library
 
-import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.R
-import com.example.musicplayer.music_player_app.frontend.screens.playlist.PlaylistActivity
 
 class LibraryAdapter(
     private val playlists: List<PlaylistInfo>,
-    private val onSelectionChanged: (Boolean) -> Unit
+    private val onSelectionModeChanged: (Boolean) -> Unit,
+    private val onPlaylistClicked: (Int, String) -> Unit
 ) : RecyclerView.Adapter<LibraryAdapter.LibraryViewHolder>() {
 
     private val selectedPlaylists = mutableSetOf<PlaylistInfo>()
@@ -25,8 +24,7 @@ class LibraryAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LibraryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_playlist_placeholder, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_playlist_placeholder, parent, false)
         return LibraryViewHolder(view)
     }
 
@@ -43,11 +41,7 @@ class LibraryAdapter(
             if (isSelectionMode) {
                 toggleSelection(playlist)
             } else {
-                val intent = Intent(holder.itemView.context, PlaylistActivity::class.java).apply {
-                    putExtra("PLAYLIST_ID", playlist.id)
-                    putExtra("PLAYLIST_NAME", playlist.name)
-                }
-                holder.itemView.context.startActivity(intent)
+                onPlaylistClicked(playlist.id, playlist.name)
             }
         }
 
@@ -55,7 +49,7 @@ class LibraryAdapter(
             if (!isSelectionMode) {
                 isSelectionMode = true
                 toggleSelection(playlist)
-                onSelectionChanged(true)
+                onSelectionModeChanged(true)
                 true
             } else {
                 false
@@ -72,7 +66,7 @@ class LibraryAdapter(
         notifyDataSetChanged()
         if (selectedPlaylists.isEmpty()) {
             isSelectionMode = false
-            onSelectionChanged(false)
+            onSelectionModeChanged(false)
         }
     }
 
@@ -81,7 +75,7 @@ class LibraryAdapter(
     fun clearSelection() {
         selectedPlaylists.clear()
         isSelectionMode = false
-        onSelectionChanged(false)
+        onSelectionModeChanged(false)
         notifyDataSetChanged()
     }
 

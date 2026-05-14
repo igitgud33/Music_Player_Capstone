@@ -1,5 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
+import android.net.Uri
 import com.example.musicplayer.music_player_app.backend.data.Playlist
 import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 
@@ -22,6 +23,7 @@ class MediaPlayerContract {
         fun onAddSongToPlaylistClick()
         fun onPlaylistSelected(playlist: Playlist)
         fun seekTo(position: Int)
+        fun loadAndPlay(uri: Uri, title: String, artist: String)
         fun onDestroy()
     }
 

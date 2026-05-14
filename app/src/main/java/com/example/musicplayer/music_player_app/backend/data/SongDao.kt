@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 
 @Dao
@@ -23,6 +24,12 @@ interface SongDao {
     @Insert
     suspend fun insertSong(song: Song)
 
+    @Update
+    suspend fun updateSong(song: Song)
+
     @Delete
     suspend fun deleteSongs(songs: List<Song>)
+
+    @Query("SELECT * FROM songs WHERE playlistId = :playlistId")
+    suspend fun getSongsByPlaylist(playlistId: Int): List<Song>
 }

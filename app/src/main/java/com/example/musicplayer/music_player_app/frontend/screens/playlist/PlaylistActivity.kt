@@ -1,17 +1,16 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
+import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
-import android.view.View
+import android.provider.OpenableColumns
+import android.util.Log
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
-import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -20,175 +19,238 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.R
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
-import com.example.musicplayer.music_player_app.backend.service.MusicService
 import com.example.musicplayer.music_player_app.frontend.screens.mediaplayer.MediaPlayerActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PlaylistActivity : AppCompatActivity(), PlaylistContract.View {
 
-    private lateinit var presenter: PlaylistPresenter
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var fabDelete: FloatingActionButton
-    private var playlistId: Int = -1
-    private var adapter: PlaylistAdapter? = null
-    
-    private var musicService: MusicService? = null
-    private var isBound = false
-    
-    private var allSongs: List<Song> = emptyList()
+    private lateinit var presenter: PlaylistContract.Presenter
+    private lateinit var adapter: PlaylistAdapter
+    private lateinit var textPlaylistTitle: TextView
+    private var currentPlaylistId: Int = -1
 
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as MusicService.MusicBinder
+    // --- NEW: Service Connection for inline playback ---
+    private var musicService: com.example.musicplayer.music_player_app.backend.service.MusicService? = null
+    private var isBound = false
+
+    private val serviceConnection = object : android.content.ServiceConnection {
+        override fun onServiceConnected(name: android.content.ComponentName?, service: android.os.IBinder?) {
+            val binder = service as com.example.musicplayer.music_player_app.backend.service.MusicService.MusicBinder
             musicService = binder.getService()
             isBound = true
+            
+            // Sync adapter state with current service state
+            musicService?.let { service ->
+                val currentSong = service.getCurrentSong()
+                adapter.setPlaybackState(currentSong?.id, service.isPlaying())
+            }
         }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
+        override fun onServiceDisconnected(name: android.content.ComponentName?) {
             musicService = null
             isBound = false
         }
     }
 
-    private var pendingTitle: String = ""
-    private var pendingArtist: String = ""
+    override fun onStart() {
+        super.onStart()
+        val intent = Intent(this, com.example.musicplayer.music_player_app.backend.service.MusicService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
 
-    private val pickAudioLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        uri?.let {
+    override fun onStop() {
+        super.onStop()
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
+    }
+
+    private val pickAudioLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { 
             try {
-                // Request persistent access to the file
-                contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
+                contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } catch (e: Exception) {
-                // Not always possible, but good to try for persistent access
+                Log.e("PlaylistActivity", "Failed to take persistable permission", e)
             }
-            presenter.addSong(pendingTitle, pendingArtist, it.toString(), playlistId)
-        } ?: showError("No file selected")
+            extractMetadataAndUpload(it) 
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playlist)
 
-        playlistId = intent.getIntExtra("PLAYLIST_ID", -1)
-        val playlistName = intent.getStringExtra("PLAYLIST_NAME") ?: "Playlist"
-        supportActionBar?.title = playlistName
+        currentPlaylistId = intent.getIntExtra("PLAYLIST_ID", -1)
+        val currentPlaylistName = intent.getStringExtra("PLAYLIST_NAME") ?: "Unknown Playlist"
 
-        recyclerView = findViewById(R.id.recyclerViewPlaylist)
-        progressBar = findViewById(R.id.progressBarPlaylist)
-        val fabAddSong = findViewById<FloatingActionButton>(R.id.fabAddSong)
-        fabDelete = findViewById(R.id.fabDeleteSongs)
-
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        if (currentPlaylistId == -1) {
+            Toast.makeText(this, "Error loading playlist", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
 
         val database = AppDatabase.getDatabase(this)
-        presenter = PlaylistPresenter(this, PlaylistModel(database))
+        val model = PlaylistModel(database.songDao(), database.playlistDao())
+        presenter = PlaylistPresenter(this, model)
 
-        fabAddSong.setOnClickListener { presenter.onAddSongClick() }
-        fabDelete.setOnClickListener {
-            adapter?.getSelectedSongs()?.let { songs ->
-                if (songs.isNotEmpty()) {
-                    AlertDialog.Builder(this)
-                        .setTitle("Delete Songs")
-                        .setMessage("Are you sure you want to delete ${songs.size} songs?")
-                        .setPositiveButton("Delete") { _, _ ->
-                            presenter.deleteSongs(songs, playlistId)
-                            adapter?.clearSelection()
-                        }
-                        .setNegativeButton("Cancel", null)
-                        .show()
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewPlaylist)
+        val fabUpload = findViewById<FloatingActionButton>(R.id.fabUploadSong)
+        textPlaylistTitle = findViewById(R.id.textPlaylistTitle)
+        val buttonEditPlaylistTitle = findViewById<ImageButton>(R.id.buttonEditPlaylistTitle)
+
+        textPlaylistTitle.text = currentPlaylistName
+
+        adapter = PlaylistAdapter(
+            onItemClicked = { song ->
+                // Row click opens the full player screen
+                val intent = Intent(this, MediaPlayerActivity::class.java).apply {
+                    putExtra("SONG_TITLE", song.title)
+                    putExtra("SONG_ARTIST", song.artist)
+                    putExtra("SONG_URI", song.fileUri)
+                }
+                startActivity(intent)
+            },
+            onPlayAction = { song, command ->
+                // Button click handles inline audio via the bound service
+                val serviceIntent = Intent(this, com.example.musicplayer.music_player_app.backend.service.MusicService::class.java)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    startForegroundService(serviceIntent)
+                } else {
+                    startService(serviceIntent)
+                }
+
+                when (command) {
+                    PlaylistAdapter.PlaybackCommand.PLAY_NEW -> musicService?.playSong(song.fileUri)
+                    PlaylistAdapter.PlaybackCommand.RESUME -> musicService?.resumeMusic()
+                    PlaylistAdapter.PlaybackCommand.PAUSE -> musicService?.pauseMusic()
+                }
+            },
+            onEditClicked = { song ->
+                showEditSongDialog(song)
+            },
+            onDeleteClicked = { song ->
+                presenter.removeSong(song)
+            }
+        )
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        fabUpload.setOnClickListener {
+            pickAudioLauncher.launch("audio/*")
+        }
+
+        buttonEditPlaylistTitle.setOnClickListener {
+            showEditPlaylistTitleDialog()
+        }
+
+        presenter.loadSongs(currentPlaylistId)
+    }
+
+    private fun extractMetadataAndUpload(uri: Uri) {
+        val retriever = MediaMetadataRetriever()
+        var title = "Unknown Title"
+        var artist = "Unknown Artist"
+
+        try {
+            retriever.setDataSource(this, uri)
+            val metaTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+            title = metaTitle ?: getFileNameFromUri(uri)
+            artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: "Unknown Artist"
+        } catch (e: Exception) {
+            title = getFileNameFromUri(uri)
+        } finally {
+            try {
+                retriever.release()
+            } catch (e: Exception) {}
+        }
+
+        presenter.uploadNewSong(title, artist, uri.toString(), currentPlaylistId)
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (index != -1) {
+                        result = cursor.getString(index)
+                    }
                 }
             }
         }
-
-        Intent(this, MusicService::class.java).also { intent ->
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
-
-        if (playlistId != -1) {
-            presenter.loadPlaylist(playlistId)
-        } else {
-            showError("Invalid Playlist")
-            finish()
-        }
-    }
-
-    override fun showLoading() {
-        progressBar.visibility = View.VISIBLE
-        recyclerView.visibility = View.GONE
-    }
-
-    override fun hideLoading() {
-        progressBar.visibility = View.GONE
-        recyclerView.visibility = View.VISIBLE
-    }
-
-    override fun displayPlaylist(songs: List<Song>) {
-        allSongs = songs
-        adapter = PlaylistAdapter(songs, { isSelectionMode ->
-            fabDelete.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
-        }, { clickedSong ->
-            onSongClicked(clickedSong)
-        })
-        recyclerView.adapter = adapter
-    }
-    
-    private fun onSongClicked(song: Song) {
-        musicService?.let { service ->
-            val index = allSongs.indexOf(song)
-            
-            val serviceIntent = Intent(this, MusicService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent)
-            } else {
-                startService(serviceIntent)
+        if (result == null) {
+            result = uri.path
+            val cut = result?.lastIndexOf('/') ?: -1
+            if (cut != -1) {
+                result = result?.substring(cut + 1)
             }
-            
-            service.setPlaylist(allSongs, index)
-            startActivity(Intent(this, MediaPlayerActivity::class.java))
-        } ?: showError("Service not connected")
+        }
+        return result?.substringBeforeLast(".") ?: "Unknown Track"
     }
 
-    override fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-
-    override fun showAddSongDialog() {
+    private fun showEditSongDialog(song: Song) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Add New Song")
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
-        layout.setPadding(50, 20, 50, 20)
-        val inputTitle = EditText(this).apply { hint = "Song Title" }
+        layout.setPadding(60, 40, 60, 0)
+
+        val inputTitle = EditText(this)
+        inputTitle.setText(song.title)
         layout.addView(inputTitle)
-        val inputArtist = EditText(this).apply { hint = "Artist" }
+
+        val inputArtist = EditText(this)
+        inputArtist.setText(song.artist)
         layout.addView(inputArtist)
+
         builder.setView(layout)
-        builder.setPositiveButton("Pick File") { _, _ ->
-            val title = inputTitle.text.toString()
-            val artist = inputArtist.text.toString()
-            if (title.isNotBlank() && artist.isNotBlank()) {
-                pendingTitle = title
-                pendingArtist = artist
-                // Using OpenDocument for persistent URI permissions
-                pickAudioLauncher.launch(arrayOf("audio/*"))
-            } else {
-                showError("Please fill title and artist")
-            }
+
+        builder.setPositiveButton("Save") { _, _ ->
+            val newTitle = inputTitle.text.toString().ifEmpty { "Unknown Title" }
+            val newArtist = inputArtist.text.toString().ifEmpty { "Unknown Artist" }
+
+            val updatedSong = song.copy(title = newTitle, artist = newArtist)
+            presenter.updateSong(updatedSong)
         }
         builder.setNegativeButton("Cancel", null)
         builder.show()
     }
 
-    override fun onDestroy() {
-        if (isBound) {
-            unbindService(serviceConnection)
-            isBound = false
+    private fun showEditPlaylistTitleDialog() {
+        val builder = AlertDialog.Builder(this)
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(60, 40, 60, 0)
+
+        val inputTitle = EditText(this)
+        inputTitle.setText(textPlaylistTitle.text)
+        layout.addView(inputTitle)
+
+        builder.setView(layout)
+        builder.setPositiveButton("Save") { _, _ ->
+            val newTitle = inputTitle.text.toString().ifEmpty { "My Playlist" }
+            textPlaylistTitle.text = newTitle
+            presenter.updatePlaylistName(currentPlaylistId, newTitle)
+            intent.putExtra("PLAYLIST_NAME", newTitle)
         }
-        presenter.onDestroy()
-        super.onDestroy()
+        builder.setNegativeButton("Cancel", null)
+        builder.show()
+    }
+
+    override fun showSongs(songs: List<Song>) {
+        adapter.submitList(songs) {
+            // After data is loaded, sync UI with service if bound
+            if (isBound) {
+                musicService?.let { service ->
+                    val currentSong = service.getCurrentSong()
+                    adapter.setPlaybackState(currentSong?.id, service.isPlaying())
+                }
+            }
+        }
+    }
+
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

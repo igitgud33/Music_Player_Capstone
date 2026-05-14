@@ -1,60 +1,30 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
-import com.example.musicplayer.music_player_app.backend.data.AppDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.musicplayer.music_player_app.backend.data.PlaylistDao
+import com.example.musicplayer.music_player_app.backend.data.SongDao
 
-class PlaylistModel(private val database: AppDatabase) : PlaylistContract.Model {
-    
-    private val scope = CoroutineScope(Dispatchers.Main)
+class PlaylistModel(
+    private val songDao: SongDao,
+    private val playlistDao: PlaylistDao
+) : PlaylistContract.Model {
 
-    override fun fetchSongs(playlistId: Int, callback: (List<Song>?, Throwable?) -> Unit) {
-        scope.launch {
-            try {
-                val songs = withContext(Dispatchers.IO) {
-                    database.songDao().getSongsForPlaylist(playlistId)
-                }
-                callback(songs, null)
-            } catch (e: Exception) {
-                callback(null, e)
-            }
-        }
+    override suspend fun getSongsByPlaylist(playlistId: Int): List<Song> {
+        return songDao.getSongsByPlaylist(playlistId)
     }
 
-    override fun insertSong(song: Song, callback: (Throwable?) -> Unit) {
-        scope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    database.songDao().insertSong(song)
-                }
-                callback(null)
-            } catch (e: Exception) {
-                callback(e)
-            }
-        }
+    override suspend fun insertSong(song: Song) {
+        songDao.insertSong(song)
     }
 
-    override fun deleteSongs(songs: List<Song>, callback: (Throwable?) -> Unit) {
-        scope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    database.songDao().deleteSongs(songs)
-                }
-                callback(null)
-            } catch (e: Exception) {
-                callback(e)
-            }
-        }
+    override suspend fun updateSong(song: Song) {
+        songDao.updateSong(song)
     }
 
-    override fun isSongInPlaylist(uri: String, playlistId: Int, callback: (Boolean) -> Unit) {
-        scope.launch {
-            val song = withContext(Dispatchers.IO) {
-                database.songDao().getSongByUriAndPlaylist(uri, playlistId)
-            }
-            callback(song != null)
-        }
+    override suspend fun deleteSong(song: Song) {
+        songDao.deleteSongs(listOf(song))
+    }
+
+    override suspend fun updatePlaylistName(playlistId: Int, newName: String) {
+        playlistDao.updatePlaylistName(playlistId, newName)
     }
 }

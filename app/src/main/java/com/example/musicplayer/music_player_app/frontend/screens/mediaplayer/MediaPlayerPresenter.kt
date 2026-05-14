@@ -1,5 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import com.example.musicplayer.music_player_app.backend.data.Playlist
@@ -7,7 +8,6 @@ import com.example.musicplayer.music_player_app.backend.service.MusicService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class MediaPlayerPresenter(
     private var view: MediaPlayerContract.View?,
@@ -19,17 +19,11 @@ class MediaPlayerPresenter(
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
     private val handler = Handler(Looper.getMainLooper())
-    private val updateProgressRunnable = object: Runnable {
+    private val updateProgressRunnable = object : Runnable {
         override fun run() {
             val current = musicService.getCurrentPosition()
-            val total = musicService.getDuration()
-            view?.updateProgress(current, total)
-
-            val currentSong = musicService.getCurrentSong()
-            if (currentSong != null) {
-                view?.updateSongInfo(currentSong.title, currentSong.artist)
-            }
-
+            val duration = musicService.getDuration()
+            view?.updateProgress(current, duration)
             view?.setPlayPauseIcon(musicService.isPlaying())
             handler.postDelayed(this, 1000)
         }
@@ -37,30 +31,31 @@ class MediaPlayerPresenter(
 
     init {
         handler.post(updateProgressRunnable)
-        loadInitialData()
     }
 
-    private fun loadInitialData() {
-        model.fetchPlaylists { playlists, error ->
-            if (error != null) {
-                // Handle error
-            } else if (playlists != null && playlists.isNotEmpty()) {
-                // view?.showPlaylistSelection(playlists)
-            }
-        }
+    override fun loadAndPlay(uri: Uri, title: String, artist: String) {
+        musicService.playSong(uri.toString())
+        view?.updateSongInfo(title, artist)
+        view?.setPlayPauseIcon(true)
     }
 
     override fun onPlayPauseClick() {
-        musicService.pauseResume()
+        if (musicService.isPlaying()) {
+            musicService.pauseMusic()
+        } else {
+            musicService.resumeMusic()
+        }
         view?.setPlayPauseIcon(musicService.isPlaying())
     }
 
     override fun onPreviousClick() {
         musicService.playPrevious()
+        updateSongInfoFromService()
     }
 
     override fun onNextClick() {
         musicService.playNext()
+        updateSongInfoFromService()
     }
 
     override fun onShuffleClick() {
@@ -68,17 +63,11 @@ class MediaPlayerPresenter(
         view?.updatePlaybackMode(musicService.getPlaybackMode())
     }
 
-    override fun onAddSongToPlaylistClick() {
-        view?.showAddSongDialog()
-    }
-
-    override fun onPlaylistSelected(playlist: Playlist) {
-        model.fetchSongsForPlaylist(playlist.id) { songs, error ->
-            if (error != null) {
-                // Handle error
-            } else if (songs != null && songs.isNotEmpty()) {
-                musicService.setPlaylist(songs, 0)
-            }
+    private fun updateSongInfoFromService() {
+        val song = musicService.getCurrentSong()
+        if (song != null) {
+            view?.updateSongInfo(song.title, song.artist)
+            view?.setPlayPauseIcon(musicService.isPlaying())
         }
     }
 
@@ -91,4 +80,7 @@ class MediaPlayerPresenter(
         job.cancel()
         view = null
     }
+
+    override fun onAddSongToPlaylistClick() {}
+    override fun onPlaylistSelected(playlist: Playlist) {}
 }

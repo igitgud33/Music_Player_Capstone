@@ -1,5 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.library
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.R
+import com.example.musicplayer.music_player_app.frontend.screens.playlist.PlaylistActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class LibraryActivity : AppCompatActivity(), LibraryContract.View {
@@ -33,7 +35,7 @@ class LibraryActivity : AppCompatActivity(), LibraryContract.View {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         presenter = LibraryPresenter(this, LibraryModel(this))
-        
+
         fabAddPlaylist.setOnClickListener { presenter.onAddPlaylistClick() }
         fabDelete.setOnClickListener {
             adapter?.getSelectedPlaylistIds()?.let { ids ->
@@ -50,7 +52,10 @@ class LibraryActivity : AppCompatActivity(), LibraryContract.View {
                 }
             }
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         presenter.loadLibrary()
     }
 
@@ -65,9 +70,19 @@ class LibraryActivity : AppCompatActivity(), LibraryContract.View {
     }
 
     override fun displayLibrary(playlists: List<PlaylistInfo>) {
-        adapter = LibraryAdapter(playlists) { isSelectionMode ->
-            fabDelete.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
-        }
+        adapter = LibraryAdapter(
+            playlists = playlists,
+            onSelectionModeChanged = { isSelectionMode ->
+                fabDelete.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
+            },
+            onPlaylistClicked = { playlistId, playlistName ->
+                val intent = Intent(this, PlaylistActivity::class.java).apply {
+                    putExtra("PLAYLIST_ID", playlistId)
+                    putExtra("PLAYLIST_NAME", playlistName)
+                }
+                startActivity(intent)
+            }
+        )
         recyclerView.adapter = adapter
     }
 

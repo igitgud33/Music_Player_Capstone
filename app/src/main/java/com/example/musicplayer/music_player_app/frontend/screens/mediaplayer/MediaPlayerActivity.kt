@@ -13,12 +13,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.example.musicplayer.R
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
 import com.example.musicplayer.music_player_app.backend.data.Playlist
 import com.example.musicplayer.music_player_app.backend.service.MusicService
 
-class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
+class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
+
     private lateinit var presenter: MediaPlayerContract.Presenter
     private var musicService: MusicService? = null
     private lateinit var seekBar: SeekBar
@@ -35,6 +37,7 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
             presenter = MediaPlayerPresenter(this@MediaPlayerActivity, musicService!!, model)
 
             setupUI()
+            handleIncomingIntent()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -49,13 +52,23 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
 
         seekBar = findViewById(R.id.seekBarPlayer)
 
-        val intent = Intent(this, MusicService::class.java)
+        val serviceIntent = Intent(this, MusicService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
+            startForegroundService(serviceIntent)
         } else {
-            startService(intent)
+            startService(serviceIntent)
         }
-        bindService(intent, serviceConnection, BIND_AUTO_CREATE)
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
+    }
+
+    private fun handleIncomingIntent() {
+        val uriString = intent.getStringExtra("SONG_URI")
+        val title = intent.getStringExtra("SONG_TITLE") ?: "Unknown Title"
+        val artist = intent.getStringExtra("SONG_ARTIST") ?: "Unknown Artist"
+
+        if (uriString != null) {
+            presenter.loadAndPlay(uriString.toUri(), title, artist)
+        }
     }
 
     private fun setupUI() {
@@ -95,14 +108,12 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
     private fun showPlaylistMenu() {
         val anchor = findViewById<TextView>(R.id.textSelectPlaylist)
         val popup = PopupMenu(this, anchor)
-        
+
         val database = AppDatabase.getDatabase(this)
         val model = MediaPlayerModel(database)
-        
+
         model.fetchPlaylists { playlists, error ->
-            if (error != null) {
-                // Handle error
-            } else if (playlists != null) {
+            if (error == null && playlists != null) {
                 if (playlists.isEmpty()) {
                     popup.menu.add("No playlists found")
                 } else {
@@ -144,9 +155,9 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
                 btn.alpha = 1.0f
                 "Mode: Shuffle"
             }
-            MusicService.PlaybackMode.LOOP -> {
+            MusicService.PlaybackMode.RANDOM -> {
                 btn.alpha = 1.0f
-                "Mode: Loop"
+                "Mode: Random"
             }
         }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -159,7 +170,7 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
 
     override fun setPlayPauseIcon(isPlaying: Boolean) {
         val playPauseBtn = findViewById<ImageButton>(R.id.btnPlayPause)
-        playPauseBtn.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+        playPauseBtn.setImageResource(if (isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
     }
 
     override fun updateProgress(currentMinSec: Int, durationMinSec: Int) {

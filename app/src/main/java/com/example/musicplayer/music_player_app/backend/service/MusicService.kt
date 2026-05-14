@@ -19,11 +19,10 @@ import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 
 class MusicService : Service() {
     private var mediaPlayer: MediaPlayer? = null
-    
     enum class PlaybackMode {
         NORMAL,  // Sequential
-        SHUFFLE, // Random order
-        LOOP     // Repeat current song
+        SHUFFLE, // Random order, all played once
+        RANDOM   // Truly random selection next
     }
 
     private var currentMode = PlaybackMode.NORMAL
@@ -50,6 +49,10 @@ class MusicService : Service() {
     override fun onBind(intent: Intent): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "STOP_SERVICE") {
+            stopSelf()
+            return START_NOT_STICKY
+        }
         val currentSong = getCurrentSong()
         val notification = createNotification(currentSong?.title ?: "Ready to play")
         startForeground(NOTIFICATION_ID, notification)
@@ -99,7 +102,11 @@ class MusicService : Service() {
                 playbackOrder = listOf(startIndex) + indices
                 currentOrderIndex = 0
             }
-            PlaybackMode.LOOP, PlaybackMode.NORMAL -> {
+            PlaybackMode.RANDOM -> {
+                playbackOrder = listOf(startIndex)
+                currentOrderIndex = 0
+            }
+            PlaybackMode.NORMAL -> {
                 playbackOrder = songList.indices.toList()
                 currentOrderIndex = startIndex
             }
@@ -120,8 +127,26 @@ class MusicService : Service() {
     fun playSong(fileUri: String) {
         Log.d("MusicService", "Attempting to play: $fileUri")
         try {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
+            // Check if it's the same song and it's just paused
+            if (mediaPlayer != null && getCurrentSong()?.fileUri == fileUri) {
+                try {
+                    if (!mediaPlayer!!.isPlaying) {
+                        mediaPlayer!!.start()
+                        updateNotification(getCurrentSong()?.title ?: "Unknown")
+                    }
+                    return
+                } catch (e: IllegalStateException) {
+                    // Fall through to recreate player if in wrong state
+                    Log.e("MusicService", "MediaPlayer in invalid state for resume, recreating", e)
+                }
+            }
+
+            // Safer release
+            mediaPlayer?.let {
+                try { it.stop() } catch (e: Exception) {}
+                it.release()
+            }
+            mediaPlayer = null
             
             mediaPlayer = MediaPlayer().apply {
                 setAudioAttributes(
@@ -154,13 +179,7 @@ class MusicService : Service() {
                     startForeground(NOTIFICATION_ID, createNotification(currentSong?.title ?: "Unknown"))
                 }
                 setOnCompletionListener {
-                    if (currentMode == PlaybackMode.LOOP) {
-                        // In Loop mode, we just play the same song again
-                        seekTo(0)
-                        it.start()
-                    } else {
-                        playNext()
-                    }
+                    playNext()
                 }
                 setOnErrorListener { _, what, extra ->
                     Log.e("MusicService", "MediaPlayer error: $what, extra: $extra")
@@ -174,9 +193,16 @@ class MusicService : Service() {
     }
 
     fun playNext() {
-        if (songList.isEmpty() || playbackOrder.isEmpty()) return
-        
-        currentOrderIndex = (currentOrderIndex + 1) % playbackOrder.size
+        if (songList.isEmpty()) return
+
+        if (currentMode == PlaybackMode.RANDOM) {
+            val nextIndex = songList.indices.random()
+            playbackOrder = playbackOrder + nextIndex
+            currentOrderIndex = playbackOrder.size - 1
+        } else {
+            if (playbackOrder.isEmpty()) return
+            currentOrderIndex = (currentOrderIndex + 1) % playbackOrder.size
+        }
         playCurrent()
     }
 
@@ -189,15 +215,25 @@ class MusicService : Service() {
             return
         }
 
-        currentOrderIndex = if (currentOrderIndex <= 0) playbackOrder.size - 1 else currentOrderIndex - 1
+        if (currentMode == PlaybackMode.RANDOM) {
+            if (currentOrderIndex > 0) {
+                currentOrderIndex--
+            } else {
+                // Already at the start of history in random mode, just stay or play a new random
+                seekTo(0)
+                return
+            }
+        } else {
+            currentOrderIndex = if (currentOrderIndex <= 0) playbackOrder.size - 1 else currentOrderIndex - 1
+        }
         playCurrent()
     }
 
     fun cyclePlaybackMode() {
         currentMode = when (currentMode) {
             PlaybackMode.NORMAL -> PlaybackMode.SHUFFLE
-            PlaybackMode.SHUFFLE -> PlaybackMode.LOOP
-            PlaybackMode.LOOP -> PlaybackMode.NORMAL
+            PlaybackMode.SHUFFLE -> PlaybackMode.RANDOM
+            PlaybackMode.RANDOM -> PlaybackMode.NORMAL
         }
 
         if (songList.isEmpty()) return
@@ -218,7 +254,18 @@ class MusicService : Service() {
                     currentOrderIndex = 0
                 }
             }
-            PlaybackMode.LOOP, PlaybackMode.NORMAL -> {
+            PlaybackMode.RANDOM -> {
+                if (currentSongIndex != -1) {
+                    playbackOrder = listOf(currentSongIndex)
+                    currentOrderIndex = 0
+                } else {
+                    val nextIndex = songList.indices.random()
+                    playbackOrder = listOf(nextIndex)
+                    currentOrderIndex = 0
+                    playCurrent()
+                }
+            }
+            PlaybackMode.NORMAL -> {
                 playbackOrder = songList.indices.toList()
                 currentOrderIndex = if (currentSongIndex != -1) currentSongIndex else 0
             }
@@ -263,5 +310,31 @@ class MusicService : Service() {
         super.onDestroy()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+
+    fun pauseMusic() {
+        try {
+            mediaPlayer?.let {
+                if (it.isPlaying) {
+                    it.pause()
+                    updateNotification("(Paused) ${getCurrentSong()?.title ?: ""}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MusicService", "Error in pauseMusic", e)
+        }
+    }
+
+    fun resumeMusic() {
+        try {
+            mediaPlayer?.let {
+                if (!it.isPlaying) {
+                    it.start()
+                    updateNotification(getCurrentSong()?.title ?: "Unknown")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MusicService", "Error in resumeMusic", e)
+        }
     }
 }
