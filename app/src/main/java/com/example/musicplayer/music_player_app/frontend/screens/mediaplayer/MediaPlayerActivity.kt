@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.os.PersistableBundle
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
@@ -29,7 +28,7 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
             presenter = MediaPlayerPresenter(this@MediaPlayerActivity, musicService!!)
 
             // seekbar init
-            seekBar = findViewById<SeekBar>(R.id.playerSeekBar)
+            seekBar = findViewById<SeekBar>(R.id.seekBarPlayer)
 
             // execute when user manually moves slider
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -79,8 +78,8 @@ class MediaPlayerActivity: AppCompatActivity(), MediaPlayerContract.View {
     }
 
     override fun updateSongInfo(title: String, artist: String) {
-        findViewById<TextView>(R.id.songTitle).text = title
-        findViewById<TextView>(R.id.songArtist).text = artist
+        findViewById<TextView>(R.id.textPlayerTitle).text = title
+        findViewById<TextView>(R.id.textPlayerArtist).text = artist
     }
 
     override fun setPlayPauseIcon(isPlaying: Boolean) {
