@@ -48,9 +48,6 @@
             android:name=".music_player_app.frontend.screens.mediaplayer.MediaPlayerActivity"
             android:exported="false"/>
 
-        <activity android:name=".music_player_app.frontend.screens.album.AlbumActivity"
-            android:exported="false"/>
-
         <service
             android:name=".music_player_app.backend.service.MusicService"
             android:enabled="true"
