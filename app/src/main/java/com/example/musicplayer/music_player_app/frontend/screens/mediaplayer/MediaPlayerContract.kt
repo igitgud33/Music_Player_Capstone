@@ -10,7 +10,6 @@ class MediaPlayerContract {
         fun updateSongInfo(title: String, artist: String)
         fun setPlayPauseIcon(isPlaying: Boolean)
         fun updateProgress(currentMinSec: Int, durationMinSec: Int)
-        fun showPlaylistSelection(playlists: List<Playlist>)
         fun updatePlaybackMode(mode: com.example.musicplayer.music_player_app.backend.service.MusicService.PlaybackMode)
         fun showAddSongDialog()
     }
@@ -21,7 +20,6 @@ class MediaPlayerContract {
         fun onNextClick()
         fun onShuffleClick()
         fun onLoopClick()
-        fun onAddSongToPlaylistClick()
         fun onPlaylistSelected(playlist: Playlist)
         fun seekTo(position: Int)
         fun loadAndPlay(uri: Uri, title: String, artist: String)

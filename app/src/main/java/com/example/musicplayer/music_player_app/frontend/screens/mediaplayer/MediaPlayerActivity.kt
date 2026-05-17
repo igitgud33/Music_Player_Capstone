@@ -66,19 +66,23 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
         val title = intent.getStringExtra("SONG_TITLE") ?: "Unknown Title"
         val artist = intent.getStringExtra("SONG_ARTIST") ?: "Unknown Artist"
 
+        // NOTE: PlaylistActivity now calls setPlaylist before starting this activity.
+        // Meaning: MusicService is given a list of songs rather than just one
+
+        // clicking a song from a playlist
         if (uriString != null) {
             val currentSong = musicService?.getCurrentSong()
-            // Even if it's the same URI, we want to ensure the UI is fresh
-            // but we only trigger 'loadAndPlay' if the service isn't already playing it.
-            // NOTE: PlaylistActivity now calls setPlaylist before starting this activity.
+            // starts again if user clicks a different song from the one currently playing
             if (currentSong?.fileUri != uriString) {
                 presenter.loadAndPlay(uriString.toUri(), title, artist)
             } else {
+                // updates text & icon
                 updateSongInfo(currentSong.title, currentSong.artist)
                 setPlayPauseIcon(musicService?.isPlaying() ?: false)
             }
         } else {
             // If no intent, just sync with current service state
+            // Checks music service if something is currently playing, and use that
             musicService?.getCurrentSong()?.let {
                 updateSongInfo(it.title, it.artist)
                 setPlayPauseIcon(musicService?.isPlaying() ?: false)
@@ -160,8 +164,6 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
         builder.setPositiveButton("OK", null)
         builder.show()
     }
-
-    override fun showPlaylistSelection(playlists: List<Playlist>) {}
 
     override fun updatePlaybackMode(mode: MusicService.PlaybackMode) {
         val btnShuffle = findViewById<ImageButton>(R.id.btnShuffle)

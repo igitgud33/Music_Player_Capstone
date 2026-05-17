@@ -123,6 +123,5 @@ class MediaPlayerPresenter(
         view = null
     }
 
-    override fun onAddSongToPlaylistClick() {}
     override fun onPlaylistSelected(playlist: Playlist) {}
 }
