@@ -165,6 +165,10 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
         builder.show()
     }
 
+    override fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     override fun updatePlaybackMode(mode: MusicService.PlaybackMode) {
         val btnShuffle = findViewById<ImageButton>(R.id.btnShuffle)
         val btnLoop = findViewById<ImageButton>(R.id.btnLoop)

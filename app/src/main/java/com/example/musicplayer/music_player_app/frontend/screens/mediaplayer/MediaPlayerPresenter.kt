@@ -1,13 +1,19 @@
 package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import com.example.musicplayer.music_player_app.backend.data.Playlist
 import com.example.musicplayer.music_player_app.backend.service.MusicService
+import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class MediaPlayerPresenter(
     private var view: MediaPlayerContract.View?,
@@ -18,29 +24,26 @@ class MediaPlayerPresenter(
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.Main + job)
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val updateProgressRunnable = object : Runnable {
-        override fun run() {
-            val current = musicService.getCurrentPosition()
-            val duration = musicService.getDuration()
-            view?.updateProgress(current, duration)
-            view?.setPlayPauseIcon(musicService.isPlaying())
-            
-            // Periodically check if the song changed (e.g. auto-next)
-            val currentSong = musicService.getCurrentSong()
-            if (currentSong != null) {
-                // This will keep the UI in sync if the service changes the song
-                view?.updateSongInfo(currentSong.title, currentSong.artist)
-            }
-            
-            handler.postDelayed(this, 1000)
-        }
+    init {
+        syncWithService()
+        startProgressUpdate()
     }
 
-    init {
-        // Immediately sync with whatever the service is doing
-        syncWithService()
-        handler.post(updateProgressRunnable)
+    private fun startProgressUpdate() {
+        scope.launch {
+            while (isActive) {
+                val current = musicService.getCurrentPosition()
+                val duration = musicService.getDuration()
+                view?.updateProgress(current, duration)
+                view?.setPlayPauseIcon(musicService.isPlaying())
+
+                val currentSong = musicService.getCurrentSong()
+                if (currentSong != null) {
+                    view?.updateSongInfo(currentSong.title, currentSong.artist)
+                }
+                delay(1000)
+            }
+        }
     }
 
     private fun syncWithService() {
@@ -53,11 +56,11 @@ class MediaPlayerPresenter(
     }
 
     override fun loadAndPlay(uri: Uri, title: String, artist: String) {
-        val song = com.example.musicplayer.music_player_app.frontend.screens.playlist.Song(
+        val song = Song(
             title = title,
             artist = artist,
             fileUri = uri.toString(),
-            playlistId = -1 // Standalone play
+            playlistId = -1
         )
         musicService.playSong(song)
         view?.updateSongInfo(title, artist)
@@ -85,7 +88,7 @@ class MediaPlayerPresenter(
 
     override fun onShuffleClick() {
         val currentMode = musicService.getPlaybackMode()
-        val newMode = if(currentMode == MusicService.PlaybackMode.SHUFFLE) {
+        val newMode = if (currentMode == MusicService.PlaybackMode.SHUFFLE) {
             MusicService.PlaybackMode.NORMAL
         } else {
             MusicService.PlaybackMode.SHUFFLE
@@ -96,7 +99,7 @@ class MediaPlayerPresenter(
 
     override fun onLoopClick() {
         val currentMode = musicService.getPlaybackMode()
-        val newMode = if(currentMode == MusicService.PlaybackMode.LOOP) {
+        val newMode = if (currentMode == MusicService.PlaybackMode.LOOP) {
             MusicService.PlaybackMode.NORMAL
         } else {
             MusicService.PlaybackMode.LOOP
@@ -118,10 +121,39 @@ class MediaPlayerPresenter(
     }
 
     override fun onDestroy() {
-        handler.removeCallbacks(updateProgressRunnable)
         job.cancel()
         view = null
     }
 
-    override fun onPlaylistSelected(playlist: Playlist) {}
+    override fun onPlaylistSelected(playlist: Playlist) {
+        scope.launch {
+            try {
+                val songs = withContext(Dispatchers.IO) {
+                    suspendCancellableCoroutine { continuation ->
+                        model.fetchSongsForPlaylist(playlist.id) { list, throwable ->
+                            if (throwable != null) {
+                                continuation.resumeWithException(throwable)
+                            } else {
+                                continuation.resume(list ?: emptyList())
+                            }
+                        }
+                    }
+                }
+
+                if (songs.isEmpty()) {
+                    view?.showError("Playlist is empty")
+                    return@launch
+                }
+
+                musicService.setPlaylist(songs, 0)
+
+                val firstSong = songs[0]
+                view?.updateSongInfo(firstSong.title, firstSong.artist)
+                view?.setPlayPauseIcon(true)
+
+            } catch (e: Exception) {
+                view?.showError(e.message ?: "Failed to load playlist")
+            }
+        }
+    }
 }

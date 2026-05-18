@@ -118,6 +118,10 @@ class MusicService : Service() {
 
         // Always update the song list first
         songList = songs
+        updatePlaybackLogic()
+        
+        // Find if the start index is within bounds of the NEW playback order
+        currentOrderIndex = playbackOrder.indexOf(startIndex).takeIf { it != -1 } ?: 0
 
         playCurrent(forceRestart = true)
     }

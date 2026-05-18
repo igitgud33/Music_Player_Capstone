@@ -12,6 +12,7 @@ class MediaPlayerContract {
         fun updateProgress(currentMinSec: Int, durationMinSec: Int)
         fun updatePlaybackMode(mode: com.example.musicplayer.music_player_app.backend.service.MusicService.PlaybackMode)
         fun showAddSongDialog()
+        fun showError(message: String)
     }
 
     interface Presenter {
