@@ -1,6 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
-interface PlaylistContract {
+class PlaylistContract {
     interface View {
         fun showSongs(songs: List<Song>)
         fun showError(message: String)

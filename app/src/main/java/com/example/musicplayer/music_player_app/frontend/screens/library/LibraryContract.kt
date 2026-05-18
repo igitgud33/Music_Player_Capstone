@@ -2,7 +2,7 @@ package com.example.musicplayer.music_player_app.frontend.screens.library
 
 import com.example.musicplayer.music_player_app.backend.data.Playlist
 
-interface LibraryContract {
+class LibraryContract {
     interface View {
         fun showLoading()
         fun hideLoading()
