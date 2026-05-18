@@ -82,30 +82,15 @@ class MediaPlayerPresenter(
     }
 
     override fun onNextClick() {
-        musicService.playNext()
+        if (!musicService.playNext(isManual = true)) {
+            view?.showError("User needs to add more songs")
+        }
         updateSongInfoFromService()
     }
 
     override fun onShuffleClick() {
-        val currentMode = musicService.getPlaybackMode()
-        val newMode = if (currentMode == MusicService.PlaybackMode.SHUFFLE) {
-            MusicService.PlaybackMode.NORMAL
-        } else {
-            MusicService.PlaybackMode.SHUFFLE
-        }
-        musicService.setPlayBackMode(newMode)
-        view?.updatePlaybackMode(newMode)
-    }
-
-    override fun onLoopClick() {
-        val currentMode = musicService.getPlaybackMode()
-        val newMode = if (currentMode == MusicService.PlaybackMode.LOOP) {
-            MusicService.PlaybackMode.NORMAL
-        } else {
-            MusicService.PlaybackMode.LOOP
-        }
-        musicService.setPlayBackMode(newMode)
-        view?.updatePlaybackMode(newMode)
+        musicService.cyclePlaybackMode()
+        view?.updatePlaybackMode(musicService.getPlaybackMode())
     }
 
     private fun updateSongInfoFromService() {

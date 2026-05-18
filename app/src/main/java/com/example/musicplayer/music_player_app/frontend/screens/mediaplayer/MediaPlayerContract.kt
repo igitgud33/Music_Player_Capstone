@@ -20,7 +20,6 @@ class MediaPlayerContract {
         fun onPreviousClick()
         fun onNextClick()
         fun onShuffleClick()
-        fun onLoopClick()
         fun onPlaylistSelected(playlist: Playlist)
         fun seekTo(position: Int)
         fun loadAndPlay(uri: Uri, title: String, artist: String)

@@ -115,10 +115,6 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
             presenter.onShuffleClick()
         }
 
-        findViewById<ImageButton>(R.id.btnLoop).setOnClickListener {
-            presenter.onLoopClick()
-        }
-
         findViewById<TextView>(R.id.textSelectPlaylist).setOnClickListener {
             showPlaylistMenu()
         }
@@ -171,22 +167,21 @@ class MediaPlayerActivity : AppCompatActivity(), MediaPlayerContract.View {
 
     override fun updatePlaybackMode(mode: MusicService.PlaybackMode) {
         val btnShuffle = findViewById<ImageButton>(R.id.btnShuffle)
-        val btnLoop = findViewById<ImageButton>(R.id.btnLoop)
         val message = when (mode) {
             MusicService.PlaybackMode.NORMAL -> {
+                btnShuffle.setImageResource(R.drawable.ic_next_arrow)
                 btnShuffle.alpha = 0.5f
-                btnLoop.alpha = 0.5f
                 "Mode: Normal"
             }
             MusicService.PlaybackMode.SHUFFLE -> {
+                btnShuffle.setImageResource(R.drawable.baseline_shuffle_24)
                 btnShuffle.alpha = 1.0f
-                btnLoop.alpha = 0.5f
                 "Mode: Shuffle"
             }
             MusicService.PlaybackMode.LOOP -> {
-                btnShuffle.alpha = 0.5f
-                btnLoop.alpha = 1.0f
-                "Mode: Loop Once"
+                btnShuffle.setImageResource(R.drawable.baseline_loop_24)
+                btnShuffle.alpha = 1.0f
+                "Mode: Loop"
             }
         }
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

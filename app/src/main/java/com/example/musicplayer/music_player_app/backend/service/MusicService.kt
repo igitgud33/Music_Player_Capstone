@@ -225,12 +225,21 @@ class MusicService : Service() {
         }
     }
 
-    fun playNext() {
-        if (songList.isEmpty() || playbackOrder.isEmpty()) return
+    fun playNext(isManual: Boolean = false): Boolean {
+        if (songList.isEmpty() || playbackOrder.isEmpty()) return false
 
         if (currentMode == PlaybackMode.LOOP) {
-            // stay on current index to repeat song
-            Log.d("MusicService", "Loop: Staying in Index=$currentOrderIndex")
+            if (isManual) {
+                if (songList.size > 1) {
+                    currentOrderIndex = (currentOrderIndex + 1) % playbackOrder.size
+                } else {
+                    // Manual skip in LOOP mode with only one song
+                    return false
+                }
+            } else {
+                // stay on current index to repeat song (auto-completion)
+                Log.d("MusicService", "Loop: Staying in Index=$currentOrderIndex")
+            }
         } else {
             // otherwise, move
             currentOrderIndex = (currentOrderIndex + 1) % playbackOrder.size
@@ -238,6 +247,7 @@ class MusicService : Service() {
 
         Log.d("MusicService", "Navigating Next: New Index=$currentOrderIndex")
         playCurrent(forceRestart = true)
+        return true
     }
 
     fun playPrevious() {
