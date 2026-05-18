@@ -1,5 +1,6 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
+import com.example.musicplayer.music_player_app.backend.data.Song
 import kotlinx.coroutines.*
 
 class PlaylistPresenter(
@@ -24,7 +25,8 @@ class PlaylistPresenter(
     override fun uploadNewSong(title: String, artist: String, fileUri: String, playlistId: Int) {
         scope.launch {
             try {
-                val newSong = Song(title = title, artist = artist, fileUri = fileUri, playlistId = playlistId)
+                val newSong =
+                    Song(title = title, artist = artist, fileUri = fileUri, playlistId = playlistId)
                 withContext(Dispatchers.IO) { model.insertSong(newSong) }
                 loadSongs(playlistId)
             } catch (e: Exception) {

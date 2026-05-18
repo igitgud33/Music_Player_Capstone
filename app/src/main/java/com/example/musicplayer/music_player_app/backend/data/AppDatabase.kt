@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
+import com.example.musicplayer.music_player_app.backend.data.Song
 
 @Database(entities = [User::class, Song::class, Playlist::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {

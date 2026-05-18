@@ -1,5 +1,7 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
+import com.example.musicplayer.music_player_app.backend.data.Song
+
 class PlaylistContract {
     interface View {
         fun showSongs(songs: List<Song>)

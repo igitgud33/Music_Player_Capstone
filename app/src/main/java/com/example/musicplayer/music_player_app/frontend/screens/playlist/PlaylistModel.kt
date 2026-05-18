@@ -1,6 +1,7 @@
 package com.example.musicplayer.music_player_app.frontend.screens.playlist
 
 import com.example.musicplayer.music_player_app.backend.data.PlaylistDao
+import com.example.musicplayer.music_player_app.backend.data.Song
 import com.example.musicplayer.music_player_app.backend.data.SongDao
 
 class PlaylistModel(

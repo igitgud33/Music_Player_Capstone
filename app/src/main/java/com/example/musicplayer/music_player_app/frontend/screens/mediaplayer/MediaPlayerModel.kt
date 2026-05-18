@@ -3,7 +3,7 @@ package com.example.musicplayer.music_player_app.frontend.screens.mediaplayer
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
 import com.example.musicplayer.music_player_app.backend.data.Playlist
 import com.example.musicplayer.music_player_app.backend.data.SessionManager
-import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
+import com.example.musicplayer.music_player_app.backend.data.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

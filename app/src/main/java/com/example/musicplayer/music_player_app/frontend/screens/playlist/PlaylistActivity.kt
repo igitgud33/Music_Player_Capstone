@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.musicplayer.R
 import com.example.musicplayer.music_player_app.backend.data.AppDatabase
+import com.example.musicplayer.music_player_app.backend.data.Song
 import com.example.musicplayer.music_player_app.frontend.screens.mediaplayer.MediaPlayerActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 

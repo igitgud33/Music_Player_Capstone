@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicplayer.R
+import com.example.musicplayer.music_player_app.backend.data.Song
 
 class PlaylistAdapter(
     private val onItemClicked: (Song) -> Unit, // Opens full player

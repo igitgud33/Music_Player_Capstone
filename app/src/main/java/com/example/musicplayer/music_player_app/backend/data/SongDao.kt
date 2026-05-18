@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
+import com.example.musicplayer.music_player_app.backend.data.Song
 
 @Dao
 interface SongDao {

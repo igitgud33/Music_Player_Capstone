@@ -15,7 +15,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.musicplayer.music_player_app.frontend.screens.playlist.Song
+import com.example.musicplayer.music_player_app.backend.data.Song
 
 class MusicService : Service() {
     private var mediaPlayer: MediaPlayer? = null
